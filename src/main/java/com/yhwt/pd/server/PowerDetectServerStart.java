@@ -63,7 +63,7 @@ public class PowerDetectServerStart {
 
 	public static void main(String[] args) {
 		PowerDetectServerStart server = new PowerDetectServerStart();
-		server.start(1313);
+		server.start(7782);
 
 		Runtime.getRuntime().addShutdownHook(new Thread(){
 			@Override

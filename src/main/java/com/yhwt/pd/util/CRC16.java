@@ -27,10 +27,20 @@ public class CRC16 {
 	 *            需要计算的数组
 	 * @return CRC16校验值
 	 */
-	public static int calcCrc16(byte[] data) {
-		return calcCrc16(data, 0, data.length);
+	public static int calcCrc16BE(byte[] data) {
+		return calcCrc16(data, 0, data.length,false);
 	}
- 
+	/**
+	 * 计算CRC16校验
+	 *
+	 * @param data
+	 *            需要计算的数组
+	 * @return CRC16校验值
+	 */
+	public static int calcCrc16LE(byte[] data) {
+		return calcCrc16(data, 0, data.length,true);
+	}
+
 	/**
 	 * 计算CRC16校验
 	 * 
@@ -42,8 +52,8 @@ public class CRC16 {
 	 *            长度
 	 * @return CRC16校验值
 	 */
-	public static int calcCrc16(byte[] data, int offset, int len) {
-		return calcCrc16(data, offset, len, 0xffff);
+	public static int calcCrc16(byte[] data, int offset, int len, boolean ifLE) {
+		return calcCrc16(data, offset, len, 0xffff,ifLE);
 	}
  
 	/**
@@ -59,7 +69,7 @@ public class CRC16 {
 	 *            之前的校验值
 	 * @return CRC16校验值
 	 */
-	public static int calcCrc16(byte[] data, int offset, int len, int preval) {
+	public static int calcCrc16(byte[] data, int offset, int len, int preval,boolean ifLE) {
 		int ucCRCHi = (preval & 0xff00) >> 8;
 		int ucCRCLo = preval & 0x00ff;
 		int iIndex;
@@ -68,26 +78,23 @@ public class CRC16 {
 			ucCRCLo = ucCRCHi ^ crc16_tab_h[iIndex];
 			ucCRCHi = crc16_tab_l[iIndex];
 		}
-		//return ((ucCRCLo & 0x00ff) << 8) | (ucCRCHi & 0x00ff) & 0xffff;//低位在前，高位在后（如果要变为大端序，把ucCRCHi和ucCRCLo互换位置）
-		return ((ucCRCHi & 0x00ff) << 8) | (ucCRCLo & 0x00ff) & 0xffff;//高位在前，低位在后（如果要变为小端序，把ucCRCHi和ucCRCLo互换位置）
+		//小端序 低位在前，高位在后（如果要变为大端序，把ucCRCHi和ucCRCLo互换位置）
+		if(ifLE){
+			return ((ucCRCLo & 0x00ff) << 8) | (ucCRCHi & 0x00ff) & 0xffff;
+		//大端序	高位在前，低位在后（如果要变为小端序，把ucCRCHi和ucCRCLo互换位置）
+		}else{
+			return ((ucCRCHi & 0x00ff) << 8) | (ucCRCLo & 0x00ff) & 0xffff;
+		}
 	}
  
 	// 测试
 	public static void main(String[] args) {
-		// 0x02 05 00 03 FF 00 , crc16=7C 09
-		byte[] bytes=new byte[] { 0x01, 0x20, 0x00, 0x60,0x00,0x02,0x04,0x01, 0x00, 0x00,0x00 };
-		int crc = CRC16.calcCrc16(bytes);
-		int crc2 = CRC16.calcCrc16(HexUtils.fromHexString("01030A2CBA0001000100010001"));
-		int crc10 = CRC16.calcCrc16(new byte[] {0x0A, 0x10, 0x11,       0x13,   -1, 0x02, 0x00, 0x00, 0x00, 0x03,0x00,        0x00, 0x00, 0x04, 0x00, 0x05, 0x00,       0x00,       0x00, 0x06 });
-		int crc03 = CRC16.calcCrc16(new byte[] {0x0A, 0x03, 0x11, (byte)0xFF, 0x00, 0x00, 0x00, 0x64, 0x00, 0x00, 0x00, (byte)0xC8, 0x00, 0x5A,   -1, 0x00, 0x01, (byte)0x86, (byte)0x9E, -1 });
-		int crc04 = CRC16.calcCrc16(new byte[] {0x0A, 0x04, 0x11,       0x00, 0x14, 0x00, 0x15, 0x00, 0x16, 0x05, 0x00,       0x17, 0x00, 0x18, 0x00, 0x19, 0x00,       0x1A,       0x00, 0x1B });
-		
-		System.out.println(String.format("0x%x", crc));
-		System.out.println(String.format("0x%x", crc2));
-		System.out.println(String.format("0x10-%x", crc10));
-		System.out.println(String.format("0x03-%x", crc03));
-		System.out.println(String.format("0x04-%x", crc04));
-		System.out.println(String.format("%.2f", 123.4567));
+		byte[] msg=HexUtils.fromHexString("01 03 14 5f c0 01 8f 03 d5 00 00 07 c0 03 e8 00 00 01 e6 6e 5e 13 86");
+		short crcBE = (short)CRC16.calcCrc16BE(msg);
+		short crcLE = (short)CRC16.calcCrc16LE(msg);
+
+		System.out.println(String.format("小端 0x%x = %d", crcLE,crcLE));
+		System.out.println(String.format("大端 0x%x = %d", crcBE,crcBE));
 	}
 	
 }

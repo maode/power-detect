@@ -1,6 +1,5 @@
 package com.yhwt.pd.entity;
 
-import java.awt.image.RescaleOp;
 import java.nio.ByteBuffer;
 
 import com.yhwt.pd.util.CRC16;
@@ -101,14 +100,14 @@ public class PowerDetectResult {
     public byte[] toNoCheckByteArray() {
         byte[] bytes = null;
         if (ifReadResult) {
-            bytes = ByteBuffer.allocate(readResult.getLength())
+            bytes = ByteBuffer.allocate(readResult.getLength()-CHECK_LEN)
                     .put(readResult.getStationCode())
                     .put(readResult.getFunctionCode())
                     .put(readResult.getDataLength())
                     .put(readResult.getData())
                     .array();
         } else {
-            bytes = ByteBuffer.allocate(writeResult.getLength())
+            bytes = ByteBuffer.allocate(writeResult.getLength()-CHECK_LEN)
                     .put(writeResult.getStationCode())
                     .put(writeResult.getFunctionCode())
                     .putShort(writeResult.getBeginAddr())
@@ -135,7 +134,7 @@ public class PowerDetectResult {
     }
 
     public short computeAndSetCRC16(){
-        int computeCrc= CRC16.calcCrc16(toNoCheckByteArray());
+        int computeCrc= CRC16.calcCrc16LE(toNoCheckByteArray());
         if(isIfReadResult()){
             readResult.setChecksum((short)computeCrc);
         }else{
@@ -147,11 +146,13 @@ public class PowerDetectResult {
     public  ReadResult initReadResult(){
         ReadResult readResult=this.new ReadResult();
         this.readResult= readResult;
+        this.ifReadResult=true;
         return readResult;
     }
     public  WriteResult initWriteResult(){
         WriteResult writeResult=this.new WriteResult();
         this.writeResult= writeResult;
+        this.ifReadResult=false;
         return writeResult;
     }
 

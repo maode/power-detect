@@ -5,7 +5,10 @@ import com.yhwt.pd.entity.PowerDetectCmd;
 import com.yhwt.pd.entity.PowerDetectResult;
 import com.yhwt.pd.util.CRC16;
 import com.yhwt.pd.util.HexUtils;
+import io.netty.buffer.ByteBufUtil;
+import io.netty.channel.Channel;
 import io.netty.channel.SimpleChannelInboundHandler;
+import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,9 +18,10 @@ import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
 
+import java.nio.CharBuffer;
 
 
-/**  
+/**
  * @Title: PlcServerHandler.java
  * @Package com.his.net.agv.nettybak.netty.server.plc
  * @Description: 自定义业务处理器
@@ -28,7 +32,10 @@ import io.netty.channel.ChannelInboundHandlerAdapter;
 @Slf4j
 public class PowerDetectServerHandler extends SimpleChannelInboundHandler<PowerDetectResult> {
 
+    //-----TEST START----
     static int testi=1;
+    public static Channel CLIENT_CHANNEL;
+    //-----TEST END----
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, PowerDetectResult result) throws Exception {
@@ -55,6 +62,7 @@ public class PowerDetectServerHandler extends SimpleChannelInboundHandler<PowerD
         }
         log.debug("server处理器准备发送数据：{}",powerDetectCmd);
         channelHandlerContext.channel().writeAndFlush(powerDetectCmd);
+        testi++;
     }
 
     @Override
@@ -73,42 +81,20 @@ public class PowerDetectServerHandler extends SimpleChannelInboundHandler<PowerD
 	 * @throws Exception
 	 * @see io.netty.channel.ChannelInboundHandlerAdapter#channelActive(io.netty.channel.ChannelHandlerContext)
 	 */
-//	@Override
-//	public void channelActive(ChannelHandlerContext ctx) throws Exception {
-//		// TODO Auto-generated method stub
-//		int i=1;
-//		do {
-//
-//			
-//			ByteBuf ou=ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap("wwwwwww\n"), CharsetUtil.UTF_8);
-//			ByteBuf ou2=ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap("ooooo\n"), CharsetUtil.UTF_8);
-//			ByteBuf ou3=ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap("3333"), CharsetUtil.UTF_8);
-//			ByteBuf ou4=ByteBufUtil.encodeString(ctx.alloc(), CharBuffer.wrap("4444\n"), CharsetUtil.UTF_8);
-//			PlcResult result=new PlcResult();
-//			result.setCode((byte)3);
-//			ByteBuf ou5=ctx.alloc().buffer();
-//			ByteBuf ou6=ctx.alloc().buffer();
-//			ou5.writeBytes(HexUtils.fromHexString("01030A2CBA00010001000100011384"));
-//			ou6.writeBytes(HexUtils.fromHexString("01030A2CBA00010001000100011384"));
-//			//ctx.write(ou2);
-//			//ctx.write(ou4);
-//			ctx.write(ou3);
-//			ctx.flush();
-//			ctx.write(ou5);
-//			ctx.flush();
-//			ctx.write(ou);
-//			ctx.write(ou6);
-//			ctx.flush();
-//			System.out.println("写了第"+i+"遍,即将沉睡");
-//				
-//		}while(false);
-//		
-//		//ctx.write(msg)
-//	}
+	@Override
+	public void channelActive(ChannelHandlerContext ctx) throws Exception {
+
+	    CLIENT_CHANNEL=ctx.channel();
+        ByteBuf buffer = ctx.alloc().buffer();
+        buffer.writeBytes(HexUtils.fromHexString(""));
+        ctx.writeAndFlush(buffer);
+
+	}
 
 	@Override
     public void exceptionCaught(ChannelHandlerContext ctx,
         Throwable cause) {
+	    log.error("抛异常了~~~看着办吧");
         cause.printStackTrace();               
         ctx.close();                           
     }

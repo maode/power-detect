@@ -76,7 +76,7 @@ public class HexUtils {
         if (input == null) {
             return null;
         }
-
+        input=input.replace(" ","");
         if ((input.length() & 1) == 1) {
             // Odd number of characters
             throw new IllegalArgumentException("16进制字符串转换为字节数组异常-长度不符合");

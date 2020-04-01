@@ -27,43 +27,43 @@ public class PowerDetectServerDecoder extends ByteToMessageDecoder {
 	 * 解码PLC返回的数据.
 	 * <p>该方法执行结束,如果没有新的可读数据,即ridx==widx,则会释放该字节缓冲区资源
 	 * @param ctx
-	 * @param in
+	 * @param byteBuf
 	 * @param out
 	 * @throws Exception
 	 * @see ByteToMessageDecoder#decode(ChannelHandlerContext, ByteBuf, List)
 	 */
 	@Override
-	protected void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
+	protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
 	
 		
 		//-----TEST START
-		in.markReaderIndex();
-        int len=in.readableBytes();
+		byteBuf.markReaderIndex();
+        int len=byteBuf.readableBytes();
         byte[] read=new byte[len];
-        in.readBytes(read);
+        byteBuf.readBytes(read);
         logger.trace("decode解码PLC反馈的数据,接受到的数据字节长度为: {} ,值为：{}",len,HexUtils.toHexString(read));    
-        in.resetReaderIndex();
+        byteBuf.resetReaderIndex();
 		//-----TEST END
         
         
         
 		//按照 地址码和功能码 组合做头部分帧（固定长度为2个字节），可读数据小于头部固定长度,则return继续等待写入
-		if (in.readableBytes() < 2) {
+		if (byteBuf.readableBytes() < 2) {
 			return;
 		}
-		in.markReaderIndex();
+		byteBuf.markReaderIndex();
 		PowerDetectResult powerDetectResult=new PowerDetectResult();
 		byte[] head=new byte[2];
 		short crc16LE = 0;
-		in.readBytes(head);
+		byteBuf.readBytes(head);
 		byte stationCode=head[0];
 		byte functionCode=head[1];
 		//"读"反馈
 		if(functionCode==0x03){
-			byte dataLength=in.readByte();
+			byte dataLength=byteBuf.readByte();
 			byte[] data=new byte[dataLength];
-			in.readBytes(data);
-			crc16LE=in.readShortLE();
+			byteBuf.readBytes(data);
+			crc16LE=byteBuf.readShort();
 			PowerDetectResult.ReadResult readResult=powerDetectResult.initReadResult();
 			readResult.setStationCode(stationCode);
 			readResult.setFunctionCode(functionCode);
@@ -71,15 +71,14 @@ public class PowerDetectServerDecoder extends ByteToMessageDecoder {
 			readResult.setData(data);
 		//"写"反馈
 		}else if(functionCode==0x10){
-			short beginAddr=in.readShort();
-			short registerCount=in.readShort();
-			crc16LE=in.readShortLE();
+			short beginAddr=byteBuf.readShort();
+			short registerCount=byteBuf.readShort();
+			crc16LE=byteBuf.readShort();
 			PowerDetectResult.WriteResult writeResult=powerDetectResult.initWriteResult();
 			writeResult.setStationCode(stationCode);
 			writeResult.setFunctionCode(functionCode);
 			writeResult.setBeginAddr(beginAddr);
 			writeResult.setRegisterCount(registerCount);
-
 		}
 
 		short computeCrc16=powerDetectResult.computeAndSetCRC16();

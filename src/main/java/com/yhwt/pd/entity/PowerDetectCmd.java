@@ -13,6 +13,15 @@ import java.nio.ByteBuffer;
 @Getter
 @Setter
 public class PowerDetectCmd {
+
+    /**
+     * @Fields BASE_LEN : 固定部分的长度(站号加功能码)
+     */
+    public static final int BASE_LEN = 2;
+    /**
+     * @Fields CHECK_LEN : 校验和固定长度
+     */
+    public static final int CHECK_LEN = 2;
     /**
      * 读功能码
      */
@@ -94,7 +103,7 @@ public class PowerDetectCmd {
 
         public int getLength() {
             //站号（地址）+功能码+起始地址+写寄存器数量+字节计数+数据+校验和
-            return 1+1+2+2+1+dataLength+2;
+            return 1+1+2+2+1+dataLength+CHECK_LEN;
         }
     }
 
@@ -106,14 +115,14 @@ public class PowerDetectCmd {
     public byte[] toNoCheckByteArray() {
         byte[] bytes = null;
         if (ifReadCmd) {
-            bytes = ByteBuffer.allocate(readCmd.getLength())
+            bytes = ByteBuffer.allocate(readCmd.getLength()-CHECK_LEN)
                     .put(readCmd.getStationCode())
                     .put(readCmd.getFunctionCode())
                     .putShort(readCmd.getBeginAddr())
                     .putShort(readCmd.getDataLength())
                     .array();
         } else {
-            bytes = ByteBuffer.allocate(writeCmd.getLength())
+            bytes = ByteBuffer.allocate(writeCmd.getLength()-CHECK_LEN)
                     .put(writeCmd.getStationCode())
                     .put(writeCmd.getFunctionCode())
                     .putShort(writeCmd.getBeginAddr())
@@ -141,7 +150,7 @@ public class PowerDetectCmd {
     }
 
     public short computeAndSetCRC16() {
-        int computeCrc = CRC16.calcCrc16(toNoCheckByteArray());
+        int computeCrc = CRC16.calcCrc16LE(toNoCheckByteArray());
         if (ifReadCmd) {
             readCmd.setChecksum((short) computeCrc);
         } else {
@@ -162,7 +171,6 @@ public class PowerDetectCmd {
         this.ifReadCmd=false;
         return writeCmd;
     }
-
 
     /**
      * 返回当前指令十六进制形式字符串
