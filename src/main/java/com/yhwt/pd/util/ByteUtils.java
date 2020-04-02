@@ -201,5 +201,29 @@ public class ByteUtils {
         s0 <<= 8 * 7;  
         s = s0 | s1 | s2 | s3 | s4 | s5 | s6 | s7;  
         return s;  
-    }  
+    }
+
+    /**byte转为无符号数
+     * @param data
+     * @return
+     */
+    public static int getUnsignedByte (byte data){
+        return data&0x0FF;
+    }
+
+    /**short转为无符号数
+     * @param data
+     * @return
+     */
+    public static int getUnsignedShort(short data){
+        return data&0xFFFF;
+    }
+
+    /**int转为无符号数
+     * @param data
+     * @return
+     */
+    public static long getUnsignedInt(int data){
+        return data&0xFFFFFF;
+    }
 }
