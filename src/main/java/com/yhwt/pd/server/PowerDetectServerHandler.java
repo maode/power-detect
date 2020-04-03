@@ -1,27 +1,16 @@
 package com.yhwt.pd.server;
 
 
-import com.yhwt.pd.entity.PowerDetectCmd;
 import com.yhwt.pd.entity.PowerDetectResult;
 import com.yhwt.pd.test.TestServerMain;
-import com.yhwt.pd.util.CRC16;
 import com.yhwt.pd.util.CmdUtil;
 import com.yhwt.pd.util.HexUtils;
-import io.netty.buffer.ByteBufUtil;
-import io.netty.channel.Channel;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.util.CharsetUtil;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandler.Sharable;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
-
-import java.nio.CharBuffer;
-
 
 
 @Sharable
@@ -53,7 +42,7 @@ public class PowerDetectServerHandler extends SimpleChannelInboundHandler<PowerD
 	@Override
 	public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-	    TestServerMain.CLIENT_CHANNEL=ctx.channel();
+	    TestServerMain.TEST_TO_CLIENT_CHANNEL =ctx.channel();
         ByteBuf buffer = ctx.alloc().buffer();
         buffer.writeBytes(HexUtils.fromHexString(""));
         ctx.writeAndFlush(buffer);
@@ -63,9 +52,7 @@ public class PowerDetectServerHandler extends SimpleChannelInboundHandler<PowerD
 	@Override
     public void exceptionCaught(ChannelHandlerContext ctx,
         Throwable cause) {
-	    log.error("抛异常了~~~看着办吧");
-        cause.printStackTrace();               
-        ctx.close();                           
+	    log.error("抛异常了~~~异常信息为->",cause);
     }
 	
 

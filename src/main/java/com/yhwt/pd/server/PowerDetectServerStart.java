@@ -38,7 +38,7 @@ public class PowerDetectServerStart {
 			ChannelFuture future = bootstrap.bind(port).syncUninterruptibly();//绑定当前机器所有网卡的port端口
 			logger.info("netty服务器已在[{}]端口启动监听", port);
 			serverChannel = future.channel();
-			logger.info("注册优雅关闭 serverChannel.closeFuture().sync()");
+			logger.info("注册优雅关闭 serverChannel.closeFuture().sync(),挂起当前线程");
 			serverChannel.closeFuture().sync();
 			logger.info("已经开始关闭 serverChannel.closeFuture().sync()");
 		} catch (InterruptedException e) {

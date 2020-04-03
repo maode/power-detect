@@ -1,7 +1,6 @@
 package com.yhwt.pd.test;
 
 import com.yhwt.pd.entity.PowerDetectCmd;
-import com.yhwt.pd.server.PowerDetectServerHandler;
 import com.yhwt.pd.server.PowerDetectServerStart;
 import com.yhwt.pd.util.CmdUtil;
 import io.netty.channel.Channel;
@@ -9,10 +8,11 @@ import io.netty.channel.Channel;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.concurrent.CompletableFuture;
 
 public class TestServerMain {
 
-    public static Channel CLIENT_CHANNEL;
+    public static Channel TEST_TO_CLIENT_CHANNEL;
 
     public static void test(){
         BufferedReader bufferedReader=new BufferedReader(new InputStreamReader(System.in));
@@ -27,7 +27,7 @@ public class TestServerMain {
                     case "3" : testCmd= CmdUtil.getWriteCleanPower((byte) 0x01);break;
                 }
 
-                CLIENT_CHANNEL.writeAndFlush(testCmd);
+                TEST_TO_CLIENT_CHANNEL.writeAndFlush(testCmd);
 
             }
         } catch (IOException e) {
@@ -38,7 +38,7 @@ public class TestServerMain {
 
     public static void main(String[] args) {
         PowerDetectServerStart server = new PowerDetectServerStart();
-        server.start(7782);
+        CompletableFuture.runAsync(()->server.start(7782));
         Runtime.getRuntime().addShutdownHook(new Thread(){
             @Override
             public void run() {

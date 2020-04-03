@@ -5,7 +5,6 @@ import com.yhwt.pd.entity.PowerDetectResult;
 import lombok.extern.slf4j.Slf4j;
 
 import java.math.BigDecimal;
-import java.security.spec.ECField;
 import java.text.DecimalFormat;
 import java.util.Arrays;
 
@@ -99,43 +98,43 @@ public class CmdUtil {
                 DecimalFormat decimalFormat = new DecimalFormat("#.##");
                 //电压
                 byte[] voltageBytes = Arrays.copyOfRange(data, 0, 2);
-                short voltageSigned = ByteUtils.byteArray2Short(voltageBytes);
-                int voltageUnsigned = ByteUtils.getUnsignedShort(voltageSigned);
+                short voltageSigned = ByteUtil.byteArray2Short(voltageBytes);
+                int voltageUnsigned = ByteUtil.getUnsignedShort(voltageSigned);
                 double voltage=numberRoundHalfUp2(voltageUnsigned*1.0/100);
                 //电流
                 byte[] electricityBytes = Arrays.copyOfRange(data, 2, 4);
-                short electricitySigned = ByteUtils.byteArray2Short(electricityBytes);
-                int electricityUnsigned = ByteUtils.getUnsignedShort(electricitySigned);
+                short electricitySigned = ByteUtil.byteArray2Short(electricityBytes);
+                int electricityUnsigned = ByteUtil.getUnsignedShort(electricitySigned);
                 double electricity=numberRoundHalfUp2(electricityUnsigned*1.0/100);
                 //有功功率
                 byte[] activePowerBytes = Arrays.copyOfRange(data, 4, 6);
-                short activePowerSigned = ByteUtils.byteArray2Short(activePowerBytes);
-                int activePower = ByteUtils.getUnsignedShort(activePowerSigned);
+                short activePowerSigned = ByteUtil.byteArray2Short(activePowerBytes);
+                int activePower = ByteUtil.getUnsignedShort(activePowerSigned);
                 //有功总电能
                 byte[] totalActivePowerBytes = Arrays.copyOfRange(data, 6, 10);
-                int totalActivePowerSigned = ByteUtils.byteArray2Int(totalActivePowerBytes);
-                long totalActivePowerUnsigned = ByteUtils.getUnsignedInt(totalActivePowerSigned);
+                int totalActivePowerSigned = ByteUtil.byteArray2Int(totalActivePowerBytes);
+                long totalActivePowerUnsigned = ByteUtil.getUnsignedInt(totalActivePowerSigned);
                 double totalActivePower = numberRoundHalfUp2(totalActivePowerUnsigned * 1.0 / 3200);
                 //功率因数
                 byte[] powerFactorBytes = Arrays.copyOfRange(data, 10, 12);
-                short powerFactorSigned = ByteUtils.byteArray2Short(powerFactorBytes);
-                int powerFactoryUnsigned = ByteUtils.getUnsignedShort(powerFactorSigned);
+                short powerFactorSigned = ByteUtil.byteArray2Short(powerFactorBytes);
+                int powerFactoryUnsigned = ByteUtil.getUnsignedShort(powerFactorSigned);
                 double powerFactory = numberRoundHalfUp2(powerFactoryUnsigned * 1.0 / 1000);
                 //二氧化碳排量
                 byte[] co2Bytes = Arrays.copyOfRange(data, 12, 16);
-                int co2Signed = ByteUtils.byteArray2Int(co2Bytes);
-                long co2Unsigned = ByteUtils.getUnsignedInt(co2Signed);
+                int co2Signed = ByteUtil.byteArray2Int(co2Bytes);
+                long co2Unsigned = ByteUtil.getUnsignedInt(co2Signed);
                 double co2 = numberRoundHalfUp2(co2Unsigned * 1.0 / 1000);
                 //温度[保留，此模块无该功能]
                 byte[] temperatureBytes = Arrays.copyOfRange(data, 16, 18);
-                short temperatureSigned = ByteUtils.byteArray2Short(temperatureBytes);
-                int temperatureUnsigned = ByteUtils.getUnsignedShort(temperatureSigned);
+                short temperatureSigned = ByteUtil.byteArray2Short(temperatureBytes);
+                int temperatureUnsigned = ByteUtil.getUnsignedShort(temperatureSigned);
                 //频率
                 byte[] frequencyBytes = Arrays.copyOfRange(data, 18, 20);
-                short frequencySigned = ByteUtils.byteArray2Short(frequencyBytes);
-                int frequencyUnsigned = ByteUtils.getUnsignedShort(frequencySigned);
+                short frequencySigned = ByteUtil.byteArray2Short(frequencyBytes);
+                int frequencyUnsigned = ByteUtil.getUnsignedShort(frequencySigned);
                 double frequency = numberRoundHalfUp2(frequencyUnsigned * 1.0 / 100);
-                log.debug("服务器收到-读取电流参数-设备地址为:{}，电流信息为-> " +
+                log.debug("服务器收到-读取电流参数反馈-设备地址为:{}，电流信息为-> " +
                         "电压：{}" +
                         "电流：{}" +
                         "有功功率：{}" +
@@ -153,8 +152,10 @@ public class CmdUtil {
             short beginAddr = writeResult.getBeginAddr();
             if(beginAddr==0x04){
                 //“写地址” 反馈
+                log.debug("服务器收到-写设备地址反馈-设备地址为：{}",stationCode);
             }else if(beginAddr==0x0C){
                 //“清电量” 反馈
+                log.debug("服务器收到-清电量反馈-设备地址为：{}",stationCode);
             }
 
 

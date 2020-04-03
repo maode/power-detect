@@ -36,14 +36,14 @@ public class PowerDetectServerDecoder extends ByteToMessageDecoder {
 	protected void decode(ChannelHandlerContext ctx, ByteBuf byteBuf, List<Object> out) throws Exception {
 	
 		
-		//-----TEST START
+		//-----解码前先打印当前信道读到的所有数据 START
 		byteBuf.markReaderIndex();
         int len=byteBuf.readableBytes();
         byte[] read=new byte[len];
         byteBuf.readBytes(read);
-        logger.trace("decode解码PLC反馈的数据,接受到的数据字节长度为: {} ,值为：{}",len,HexUtils.toHexString(read));    
+        logger.trace("上位机解码器接收到数据,数据字节长度为: {} ,值为：{}",len,HexUtils.toHexString(read));
         byteBuf.resetReaderIndex();
-		//-----TEST END
+		//-----解码前先打印当前信道读到的所有数据 END
         
         
         

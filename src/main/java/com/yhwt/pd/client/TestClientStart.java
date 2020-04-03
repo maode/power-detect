@@ -1,7 +1,7 @@
 package com.yhwt.pd.client;
 
+import com.yhwt.pd.test.TestClientMain;
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.Channel;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import lombok.Getter;
@@ -14,7 +14,6 @@ public class TestClientStart {
     private Logger logger = LoggerFactory.getLogger(getClass());
 
     private NioEventLoopGroup workGroup = new NioEventLoopGroup();
-    private Channel channel;
     private Bootstrap bootstrap;
     private final String host;
     private final int port;
@@ -37,7 +36,7 @@ public class TestClientStart {
                     .handler(new TestClientInitializer())
                     .localAddress(localPort)
             ;
-            channel = bootstrap.connect(host, port).sync().channel();
+            TestClientMain.TEST_TO_SERVER_CHANNEL = bootstrap.connect(host, port).sync().channel();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

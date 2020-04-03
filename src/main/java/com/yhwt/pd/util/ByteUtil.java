@@ -9,7 +9,7 @@ import java.nio.ByteBuffer;
  * @author ZhengMaoDe   
  * @date 2018年4月25日 下午12:45:21 
  */
-public class ByteUtils {
+public class ByteUtil {
 
 
     /** 

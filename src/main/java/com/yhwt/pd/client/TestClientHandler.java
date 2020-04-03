@@ -1,5 +1,6 @@
 package com.yhwt.pd.client;
 
+import com.yhwt.pd.test.TestClientMain;
 import com.yhwt.pd.util.HexUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufUtil;
@@ -20,7 +21,8 @@ public  class TestClientHandler extends SimpleChannelInboundHandler<byte[]> {
 
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, byte[] bytes) throws Exception {
-
         log.debug("客户端收到的消息为："+ HexUtils.toHexString(bytes));
+        //模拟客户端设备反馈
+        TestClientMain.mockClientResult(bytes);
     }
 }
